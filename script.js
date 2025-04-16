@@ -49,6 +49,7 @@ if (window.hasRunAlyclick) {
 
     // Vérifie si l'élément existe avant de manipuler sa classList
     if (container) {
+      // Ajout d'une animation à chaque changement
       container.classList.add("animated");
       setTimeout(() => {
         container.classList.remove("animated");
