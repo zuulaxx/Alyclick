@@ -1,34 +1,66 @@
+/* Style global */
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #121212;
-  color: #fff;
-  text-align: center;
-  padding: 30px;
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  color: #333;
 }
 
+/* Titre principal */
+h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #4CAF50;
+}
+
+/* Sous-titres */
+h2 {
+  font-size: 2rem;
+  color: #333;
+}
+
+/* Affichage du score */
+#score {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+/* Style du bouton */
 button {
-  font-size: 1.2em;
-  padding: 10px 20px;
-  margin-top: 20px;
-  background-color: #00cc88;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  background-color: #4CAF50;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
+/* Effet au survol du bouton */
 button:hover {
-  background-color: #009966;
+  background-color: #45a049;
 }
 
-#players {
-  font-size: 1.2em;
-  margin-top: 10px;
-  transition: transform 0.2s ease, color 0.3s ease;
+/* Animation pour les éléments */
+.animated {
+  animation: fadeInOut 0.5s ease-in-out;
 }
 
-#players.animated {
-  transform: scale(1.1);
-  color: #00ffcc;
+/* Animation fade in/out */
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Conteneur général */
+.container {
+  text-align: center;
 }
