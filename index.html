@@ -1,17 +1,27 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Alyclick</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alyclick - Le Jeu</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🚀 Alyclick</h1>
-  <p>💰 Score de l'entreprise : <span id="score">0</span></p>
-  <button id="clickBtn">💼 Investir !</button>
-  <div id="players">👥 Joueurs connectés : <span id="playerCount">0</span></div>
+  <h1>Alyclick</h1>
 
+  <div>
+    <h2>Score : <span id="score">0</span></h2>
+    <button id="invest">Investir</button>
+  </div>
+  
+  <div>
+    <h2>Joueurs Connectés: <span id="playerCount">0</span></h2>
+  </div>
+
+  <!-- CDN pour Socket.io -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <!-- Ton script JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
