@@ -1,37 +1,34 @@
 body {
   font-family: 'Segoe UI', sans-serif;
+  background: #121212;
+  color: #fff;
   text-align: center;
-  background: #fafafa;
-  padding: 2rem;
-  color: #333;
-}
-
-h1 {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-}
-
-p {
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
-}
-
-.counter {
-  font-size: 2rem;
-  margin: 1.5rem 0;
+  padding: 30px;
 }
 
 button {
-  font-size: 1.5rem;
-  padding: 1rem 2.5rem;
-  border: none;
-  border-radius: 12px;
-  background-color: #00b894;
+  font-size: 1.2em;
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #00cc88;
   color: white;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #019875;
+  background-color: #009966;
+}
+
+#players {
+  font-size: 1.2em;
+  margin-top: 10px;
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+
+#players.animated {
+  transform: scale(1.1);
+  color: #00ffcc;
 }
