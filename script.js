@@ -18,7 +18,7 @@ if (window.hasRunAlyclick) {
   console.log("Tentative de connexion socket...");
 
   socket.on("connect", () => {
-    console.log("✅ Connecté au serveur via socket !");
+    console.log("✅ Connecté, ID socket :", socket.id);
   });
 
   socket.on("connect_error", (err) => {
