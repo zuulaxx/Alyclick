@@ -46,9 +46,15 @@ if (window.hasRunAlyclick) {
     playerCountDisplay.textContent = count;
 
     const container = document.getElementById("players");
-    container.classList.add("animated");
-    setTimeout(() => {
-      container.classList.remove("animated");
-    }, 300);
+
+    // Vérifie si l'élément existe avant de manipuler sa classList
+    if (container) {
+      container.classList.add("animated");
+      setTimeout(() => {
+        container.classList.remove("animated");
+      }, 300);
+    } else {
+      console.error("L'élément #players est introuvable !");
+    }
   });
 }
