@@ -1,23 +1,46 @@
-const socket = io("https://alyclick.glitch.me");
+// Connexion au serveur Glitch avec transport WebSocket forcé
+const socket = io("https://alyclick.glitch.me", {
+  transports: ["websocket"]
+});
 
+// DOM Elements
 const scoreDisplay = document.getElementById("score");
-const clickBtn = document.getElementById("clickBtn");
+const investBtn = document.getElementById("invest");
 const playerCountDisplay = document.getElementById("playerCount");
 
-clickBtn.addEventListener("click", () => {
+// Debug : voir si on est bien connecté
+console.log("Tentative de connexion socket...");
+
+socket.on("connect", () => {
+  console.log("✅ Connecté au serveur via socket !");
+});
+
+socket.on("connect_error", (err) => {
+  console.error("❌ Erreur de connexion socket :", err);
+});
+
+// Quand un joueur clique sur "Investir"
+investBtn.addEventListener("click", () => {
   socket.emit("click");
 });
 
+// Mise à jour du score en temps réel
 socket.on("scoreUpdate", (score) => {
   scoreDisplay.textContent = score;
+
+  // Petite animation de feedback
+  scoreDisplay.classList.add("animated");
+  setTimeout(() => {
+    scoreDisplay.classList.remove("animated");
+  }, 300);
 });
 
+// Mise à jour du nombre de joueurs connectés
 socket.on("playerCount", (count) => {
   playerCountDisplay.textContent = count;
 
   const container = document.getElementById("players");
   container.classList.add("animated");
-
   setTimeout(() => {
     container.classList.remove("animated");
   }, 300);
