@@ -13,8 +13,10 @@ if (window.hasRunAlyclick) {
   const scoreDisplay = document.getElementById("score");
   const investBtn = document.getElementById("invest");
   const playerCountDisplay = document.getElementById("playerCount");
+  const statusText = document.getElementById("status-text"); // Pour l'état du serveur
 
-  // Debug : voir si on est bien connecté
+  let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
+
   console.log("Tentative de connexion socket...");
 
   socket.on("connect", () => {
@@ -30,11 +32,11 @@ if (window.hasRunAlyclick) {
     socket.emit("click");
   });
 
-  // Mise à jour du score en temps réel
+  // Mise à jour du score
   socket.on("scoreUpdate", (score) => {
     scoreDisplay.textContent = score;
 
-    // Petite animation de feedback
+    // Petite anim
     scoreDisplay.classList.add("animated");
     setTimeout(() => {
       scoreDisplay.classList.remove("animated");
@@ -46,10 +48,7 @@ if (window.hasRunAlyclick) {
     playerCountDisplay.textContent = count;
 
     const container = document.getElementById("players");
-
-    // Vérifie si l'élément existe avant de manipuler sa classList
     if (container) {
-      // Ajout d'une animation à chaque changement
       container.classList.add("animated");
       setTimeout(() => {
         container.classList.remove("animated");
@@ -58,4 +57,25 @@ if (window.hasRunAlyclick) {
       console.error("L'élément #players est introuvable !");
     }
   });
+
+  // Heartbeat toutes les minutes = serveur actif
+  socket.on("heartbeat", (msg) => {
+    console.log("📡 Heartbeat reçu :", msg);
+    lastPing = Date.now();
+    if (statusText) {
+      statusText.textContent = "Actif";
+      statusText.style.color = "lime";
+    }
+  });
+
+  // Vérifie toutes les 5s si le serveur est toujours là
+  setInterval(() => {
+    const now = Date.now();
+    if (now - lastPing > 70000) {
+      if (statusText) {
+        statusText.textContent = "En veille";
+        statusText.style.color = "red";
+      }
+    }
+  }, 5000);
 }
