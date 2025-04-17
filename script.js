@@ -35,12 +35,6 @@ if (window.hasRunAlyclick) {
   // Mise à jour du score
   socket.on("scoreUpdate", (score) => {
     scoreDisplay.textContent = score;
-
-    // Petite anim
-    scoreDisplay.classList.add("animated");
-    setTimeout(() => {
-      scoreDisplay.classList.remove("animated");
-    }, 300);
   });
 
   // Mise à jour du nombre de joueurs connectés
