@@ -17,6 +17,7 @@ if (window.hasRunAlyclick) {
   const serverTimeDisplay = document.getElementById("server-time"); // Pour l'affichage du temps du serveur
 
   let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
+  const serverStartTime = Date.now(); // Heure du démarrage du serveur
 
   console.log("Tentative de connexion socket...");
 
@@ -74,10 +75,28 @@ if (window.hasRunAlyclick) {
     }
   }, 5000);
 
-  // Mise à jour de l'heure du serveur
-  socket.on("serverTime", (serverTime) => {
+  // Fonction pour formater le temps écoulé
+  function formatTime(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30); // approximation
+    const years = Math.floor(months / 12); // approximation
+
+    if (years > 0) return `En ligne depuis ${years} an${years > 1 ? 's' : ''}`;
+    if (months > 0) return `En ligne depuis ${months} mois`;
+    if (days > 0) return `En ligne depuis ${days} jour${days > 1 ? 's' : ''}`;
+    if (hours > 0) return `En ligne depuis ${hours} heure${hours > 1 ? 's' : ''}`;
+    if (minutes > 0) return `En ligne depuis ${minutes} minute${minutes > 1 ? 's' : ''}`;
+    return `En ligne depuis ${seconds} seconde${seconds > 1 ? 's' : ''}`;
+  }
+
+  // Mise à jour du temps passé en ligne
+  setInterval(() => {
+    const timeElapsed = Date.now() - serverStartTime;
     if (serverTimeDisplay) {
-      serverTimeDisplay.textContent = 'Server Time: ' + serverTime;
+      serverTimeDisplay.textContent = formatTime(timeElapsed);
     }
-  });
+  }, 1000); // Actualisation toutes les secondes
 }
