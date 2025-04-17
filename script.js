@@ -14,6 +14,7 @@ if (window.hasRunAlyclick) {
   const investBtn = document.getElementById("invest");
   const playerCountDisplay = document.getElementById("playerCount");
   const statusText = document.getElementById("status-text"); // Pour l'état du serveur
+  const serverTimeDisplay = document.getElementById("server-time"); // Pour l'affichage du temps du serveur
 
   let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
 
@@ -72,4 +73,11 @@ if (window.hasRunAlyclick) {
       }
     }
   }, 5000);
+
+  // Mise à jour de l'heure du serveur
+  socket.on("serverTime", (serverTime) => {
+    if (serverTimeDisplay) {
+      serverTimeDisplay.textContent = 'Server Time: ' + serverTime;
+    }
+  });
 }
