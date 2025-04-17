@@ -106,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
     setInterval(() => {
       if (serverStartTime) {
         const timeElapsed = Date.now() - serverStartTime;
-        console.log(`Temps écoulé en ms : ${timeElapsed}`); // Log pour vérifier la différence
         if (serverTimeDisplay) {
           serverTimeDisplay.textContent = formatTime(timeElapsed);
         }
