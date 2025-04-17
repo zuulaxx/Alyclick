@@ -57,17 +57,6 @@ button:hover {
   background-color: #45a049;
 }
 
-/* Animation pour les éléments */
-.animated {
-  animation: pop 0.3s ease;
-}
-
-@keyframes pop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
 /* Conteneur général */
 .container {
   text-align: center;
