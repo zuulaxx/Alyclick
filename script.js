@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Vérifie toutes les 5s si le serveur est toujours là
     setInterval(() => {
       const now = Date.now();
-      if (now - lastPing > 70000) {
+      if (now - lastPing > 10000) {
         if (statusText) {
           statusText.textContent = "En veille";
           statusText.style.color = "red";
