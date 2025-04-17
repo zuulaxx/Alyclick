@@ -59,14 +59,13 @@ button:hover {
 
 /* Animation pour les éléments */
 .animated {
-  animation: fadeInOut 0.5s ease-in-out;
+  animation: pop 0.3s ease;
 }
 
-/* Animation fade in/out */
-@keyframes fadeInOut {
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0; }
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 /* Conteneur général */
