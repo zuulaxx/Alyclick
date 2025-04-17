@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const serverTimeDisplay = document.getElementById("server-time"); // Pour l'affichage du temps du serveur
 
     let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
-    const serverStartTime = Date.now(); // Heure du démarrage du serveur
+    let serverStartTime = null; // Temps de démarrage du serveur récupéré depuis le backend
 
     console.log("Tentative de connexion socket...");
 
@@ -65,6 +65,11 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
+    // Récupère le temps de démarrage du serveur
+    socket.on("serverStartTime", (startTime) => {
+      serverStartTime = startTime; // Enregistre le temps de démarrage du serveur
+    });
+
     // Vérifie toutes les 5s si le serveur est toujours là
     setInterval(() => {
       const now = Date.now();
@@ -99,10 +104,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Mise à jour du temps passé en ligne
     setInterval(() => {
-      const timeElapsed = Date.now() - serverStartTime;
-      console.log(`Temps écoulé en ms : ${timeElapsed}`); // Log pour vérifier la différence
-      if (serverTimeDisplay) {
-        serverTimeDisplay.textContent = formatTime(timeElapsed);
+      if (serverStartTime) {
+        const timeElapsed = Date.now() - serverStartTime;
+        console.log(`Temps écoulé en ms : ${timeElapsed}`); // Log pour vérifier la différence
+        if (serverTimeDisplay) {
+          serverTimeDisplay.textContent = formatTime(timeElapsed);
+        }
       }
     }, 1000); // Actualisation toutes les secondes
   }
