@@ -17,10 +17,12 @@ h1 {
   align-items: center;
   justify-content: space-between;
   font-size: 3rem;
- /* margin-bottom: 1rem; */
   color: #4CAF50;
 }
 .logo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 1em;
   height: 1em;
   border-radius: 50%;
