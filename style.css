@@ -13,13 +13,13 @@ body {
 
 /* Titre principal */
 h1 {
-  display: flex;
+  align-content: center;
   align-items: center;
   font-size: 3rem;
   color: #4CAF50;
 }
 .logo {
-  display: flex;
+  align-content: center;
   align-items: center;
   width: 1em;
   height: 1em;
