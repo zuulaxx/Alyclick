@@ -15,12 +15,14 @@ body {
 h1 {
   align-content: center;
   align-items: center;
+  vertical-align: middle;
   font-size: 3rem;
   color: #4CAF50;
 }
 .logo {
   align-content: center;
   align-items: center;
+  vertical-align: middle;
   width: 1em;
   height: 1em;
   border-radius: 50%;
