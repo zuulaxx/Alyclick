@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const upgradeClickLevelDisplay = document.getElementById("upgradeClickLevel"); // Pour afficher le niveau Upgrade Click
     const autoClickerLevelDisplay = document.getElementById("autoClickerLevel"); // Pour afficher le niveau AutoClicker
     const tempBoostStatus = document.getElementById("tempBoostStatus"); // Pour afficher l'état du Boost Temporaire
-
-    // Boutons d'achat des améliorations
-    const afkBoostBtn = document.getElementById("afkBoost");
-    const upgradeClickBoostBtn = document.getElementById("upgradeClickBoost");
-    const autoClickerBoostBtn = document.getElementById("autoClickerBoost");
+    const tempBoostButton = document.getElementById("tempBoostButton"); // Bouton du Boost Temporaire
+    const tempBoostTimer = document.getElementById("tempBoostTimer"); // Affichage du timer
 
     let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
     let serverStartTime = null; // Temps de démarrage du serveur récupéré depuis le backend
+
+    let tempBoostCooldown = false;
+    let tempBoostActive = false;
 
     console.log("Tentative de connexion socket...");
 
@@ -45,16 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Quand un joueur clique pour acheter un boost
-    afkBoostBtn.addEventListener("click", () => {
-      socket.emit("buyAfkBoost");
-    });
-
-    upgradeClickBoostBtn.addEventListener("click", () => {
-      socket.emit("buyUpgradeClick");
-    });
-
-    autoClickerBoostBtn.addEventListener("click", () => {
-      socket.emit("buyAutoClicker");
+    tempBoostButton.addEventListener("click", () => {
+      socket.emit("buyTempBoost");
     });
 
     // Mise à jour du score
@@ -90,13 +82,27 @@ document.addEventListener('DOMContentLoaded', function () {
       autoClickerLevelDisplay.textContent = `Niveau AutoClicker: ${level}`;
     });
 
-    socket.on("tempBoostStatus", (status) => {
-      if (status) {
+    socket.on("tempBoostActive", (isActive) => {
+      tempBoostActive = isActive;
+      if (tempBoostActive) {
+        tempBoostButton.disabled = true; // Désactive le bouton pendant le boost
+        startCountdown(30); // Lancer le compte à rebours de 30s
         tempBoostStatus.textContent = "Boost Temporaire Activé !";
         tempBoostStatus.style.color = "lime";
       } else {
+        tempBoostButton.disabled = false; // Réactive le bouton après le boost
         tempBoostStatus.textContent = "Boost Temporaire Inactif";
         tempBoostStatus.style.color = "red";
+      }
+    });
+
+    socket.on("tempBoostCooldown", (isCooldown) => {
+      tempBoostCooldown = isCooldown;
+      if (tempBoostCooldown) {
+        tempBoostButton.disabled = true; // Grise le bouton pendant le cooldown
+        startCountdown(60); // Compte à rebours de 1 minute
+      } else {
+        tempBoostButton.disabled = false; // Réactive le bouton après le cooldown
       }
     });
 
@@ -156,5 +162,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }
     }, 1000); // Actualisation toutes les secondes
+
+    // Fonction pour démarrer le compte à rebours
+    function startCountdown(seconds) {
+      let remainingTime = seconds;
+      tempBoostTimer.textContent = `Temps restant: ${remainingTime}s`;
+
+      const countdownInterval = setInterval(() => {
+        remainingTime--;
+        tempBoostTimer.textContent = `Temps restant: ${remainingTime}s`;
+
+        if (remainingTime <= 0) {
+          clearInterval(countdownInterval);
+          tempBoostTimer.textContent = '';
+        }
+      }, 1000);
+    }
   }
 });
