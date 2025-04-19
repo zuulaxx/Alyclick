@@ -46,15 +46,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Quand un joueur clique pour acheter un boost
     afkBoostBtn.addEventListener("click", () => {
-      socket.emit("buyAFKBoost");
+      socket.emit("buyAfkBoost");
     });
 
     upgradeClickBoostBtn.addEventListener("click", () => {
-      socket.emit("buyUpgradeClickBoost");
+      socket.emit("buyUpgradeClick");
     });
 
     autoClickerBoostBtn.addEventListener("click", () => {
-      socket.emit("buyAutoClickerBoost");
+      socket.emit("buyAutoClicker");
     });
 
     // Mise à jour du score
