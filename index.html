@@ -21,13 +21,22 @@
       <!-- Conteneur pour les joueurs -->
       <div id="players"></div>
     </div>
+
+    <!-- Affichage des niveaux d'amélioration -->
+    <div>
+      <h3>Améliorations :</h3>
+      <p id="afkLevel">Niveau AFK: 0</p>
+      <p id="upgradeClickLevel">Niveau Upgrade Click: 0</p>
+      <p id="autoClickerLevel">Niveau AutoClicker: 0</p>
+      <p id="tempBoostStatus">Boost Temporaire Inactif</p>
+    </div>
   </div>
 
   <div id="server-status">
     État du serveur : <span id="status-text">Inconnu (Démarrage...)</span>
   </div>
   <div id="server-time" style="position: absolute; top: 10px; right: 10px; font-size: 14px; color: white; background-color: rgba(0, 0, 0, 0.5); padding: 5px; border-radius: 5px;">
-  En ligne depuis ❓❓❓
+    En ligne depuis ❓❓❓
   </div>
 
   <!-- CDN pour Socket.io -->
