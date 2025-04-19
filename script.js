@@ -1,160 +1,201 @@
-document.addEventListener('DOMContentLoaded', function () {
-  // Empêcher l'exécution multiple du script
-  if (window.hasRunAlyclick) {
-    console.log("🔁 Script déjà chargé, annulation...");
-  } else {
-    window.hasRunAlyclick = true;
+const express = require("express");
+const http = require("http");
+const socketIO = require("socket.io");
+const fs = require("fs");
+const axios = require("axios");
 
-    // Connexion au serveur Glitch avec transport WebSocket forcé
-    const socket = io("https://alyclick.glitch.me", {
-      transports: ["websocket"]
-    });
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
 
-    // DOM Elements
-    const scoreDisplay = document.getElementById("score");
-    const investBtn = document.getElementById("invest");
-    const playerCountDisplay = document.getElementById("playerCount");
-    const statusText = document.getElementById("status-text"); // Pour l'état du serveur
-    const serverTimeDisplay = document.getElementById("server-time"); // Pour l'affichage du temps du serveur
-    const afkLevelDisplay = document.getElementById("afkLevel"); // Pour afficher le niveau AFK
-    const upgradeClickLevelDisplay = document.getElementById("upgradeClickLevel"); // Pour afficher le niveau Upgrade Click
-    const autoClickerLevelDisplay = document.getElementById("autoClickerLevel"); // Pour afficher le niveau AutoClicker
-    const tempBoostStatus = document.getElementById("tempBoostStatus"); // Pour afficher l'état du Boost Temporaire
+// === CONFIG ===
+const SCORE_FILE = ".data/score.json"; // Fichier contenant score et niveaux des améliorations
 
-    // Boutons d'achat des améliorations
-    const afkBoostBtn = document.getElementById("afkBoost");
-    const upgradeClickBoostBtn = document.getElementById("upgradeClickBoost");
-    const autoClickerBoostBtn = document.getElementById("autoClickerBoost");
+// === SCORE ET AMÉLIORATIONS ===
+let score = 0;
+let afkLevel = 0;
+let upgradeClickLevel = 0;
+let autoClickerLevel = 0;
+let tempBoostActive = false;
+let lastBoostTime = 0;
 
-    let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
-    let serverStartTime = null; // Temps de démarrage du serveur récupéré depuis le backend
+const serverStartTime = Date.now(); // Gardé uniquement en mémoire (pas stocké dans le fichier)
 
-    console.log("Tentative de connexion socket...");
-
-    socket.on("connect", () => {
-      console.log("✅ Connecté, ID socket :", socket.id);
-    });
-
-    socket.on("connect_error", (err) => {
-      console.error("❌ Erreur de connexion socket :", err);
-    });
-
-    // Quand un joueur clique sur "Investir"
-    investBtn.addEventListener("click", () => {
-      socket.emit("click");
-    });
-
-    // Quand un joueur clique pour acheter un boost
-    afkBoostBtn.addEventListener("click", () => {
-      socket.emit("buyAFKBoost");
-    });
-
-    upgradeClickBoostBtn.addEventListener("click", () => {
-      socket.emit("buyUpgradeClickBoost");
-    });
-
-    autoClickerBoostBtn.addEventListener("click", () => {
-      socket.emit("buyAutoClickerBoost");
-    });
-
-    // Mise à jour du score
-    socket.on("scoreUpdate", (score) => {
-      scoreDisplay.textContent = score;
-    });
-
-    // Mise à jour du nombre de joueurs connectés
-    socket.on("playerCount", (count) => {
-      playerCountDisplay.textContent = count;
-
-      const container = document.getElementById("players");
-      if (container) {
-        container.classList.add("animated");
-        setTimeout(() => {
-          container.classList.remove("animated");
-        }, 300);
-      } else {
-        console.error("L'élément #players est introuvable !");
-      }
-    });
-
-    // Mise à jour des niveaux d'amélioration
-    socket.on("afkLevel", (level) => {
-      afkLevelDisplay.textContent = `Niveau AFK: ${level}`;
-    });
-
-    socket.on("upgradeClickLevel", (level) => {
-      upgradeClickLevelDisplay.textContent = `Niveau Upgrade Click: ${level}`;
-    });
-
-    socket.on("autoClickerLevel", (level) => {
-      autoClickerLevelDisplay.textContent = `Niveau AutoClicker: ${level}`;
-    });
-
-    socket.on("tempBoostStatus", (status) => {
-      if (status) {
-        tempBoostStatus.textContent = "Boost Temporaire Activé !";
-        tempBoostStatus.style.color = "lime";
-      } else {
-        tempBoostStatus.textContent = "Boost Temporaire Inactif";
-        tempBoostStatus.style.color = "red";
-      }
-    });
-
-    // Heartbeat toutes les minutes = serveur actif
-    socket.on("heartbeat", (msg) => {
-      console.log("📡 Heartbeat reçu :", msg);
-      lastPing = Date.now();
-      if (statusText) {
-        statusText.textContent = "Actif";
-        statusText.style.color = "lime";
-      }
-    });
-
-    // Récupère le temps de démarrage du serveur
-    socket.on("serverStartTime", (startTime) => {
-      serverStartTime = startTime; // Enregistre le temps de démarrage du serveur
-    });
-
-    // Vérifie toutes les 5s si le serveur est toujours là
-    setInterval(() => {
-      const now = Date.now();
-      if (now - lastPing > 10000) {
-        if (statusText) {
-          statusText.textContent = "En veille";
-          statusText.style.color = "red";
-        }
-      }
-    }, 5000);
-
-    // Fonction pour formater le temps écoulé
-    function formatTime(ms) {
-      const seconds = Math.floor(ms / 1000);
-      const minutes = Math.floor(seconds / 60);
-      const hours = Math.floor(minutes / 60);
-      const days = Math.floor(hours / 24);
-      const months = Math.floor(days / 30); // approximation
-      const years = Math.floor(months / 12); // approximation
-
-      let timeString = `En ligne depuis `;
-
-      if (years > 0) timeString += `${years} an${years > 1 ? 's' : ''} `;
-      if (months > 0) timeString += `${months % 12} mois `;
-      if (days > 0) timeString += `${days % 30} jour${days > 1 ? 's' : ''} `;
-      if (hours > 0) timeString += `${hours % 24} heure${hours > 1 ? 's' : ''} `;
-      if (minutes > 0) timeString += `${minutes % 60} minute${minutes > 1 ? 's' : ''} `;
-      timeString += `${seconds % 60} seconde${seconds > 1 ? 's' : ''}`;
-
-      return timeString;
-    }
-
-    // Mise à jour du temps passé en ligne
-    setInterval(() => {
-      if (serverStartTime) {
-        const timeElapsed = Date.now() - serverStartTime;
-        if (serverTimeDisplay) {
-          serverTimeDisplay.textContent = formatTime(timeElapsed);
-        }
-      }
-    }, 1000); // Actualisation toutes les secondes
+// Charger le score et les améliorations depuis le fichier
+if (fs.existsSync(SCORE_FILE)) {
+  try {
+    const data = fs.readFileSync(SCORE_FILE);
+    const json = JSON.parse(data);
+    score = json.score || 0;
+    afkLevel = json.afkLevel || 0;
+    upgradeClickLevel = json.upgradeClickLevel || 0;
+    autoClickerLevel = json.autoClickerLevel || 0;
+    console.log("✅ Score et améliorations chargés");
+  } catch (err) {
+    console.error("⚠️ Erreur lecture", err);
   }
+}
+
+// Sauvegarder score et niveaux d'améliorations
+function saveScore() {
+  const data = {
+    score,
+    afkLevel,
+    upgradeClickLevel,
+    autoClickerLevel
+  };
+
+  fs.writeFile(SCORE_FILE, JSON.stringify(data, null, 2), (err) => {
+    if (err) {
+      console.error("❌ Erreur sauvegarde score :", err);
+    } else {
+      console.log("💾 Score et améliorations sauvegardés :", score);
+    }
+  });
+}
+
+// === STATIC FILES ===
+app.use(express.static("public"));
+
+// === API POUR AFFICHER LE SCORE ===
+app.get("/api/score", (req, res) => {
+  res.json({ score, afkLevel, upgradeClickLevel, autoClickerLevel });
+});
+
+// === PING POUR GARDER EN VIE ===
+app.get("/ping", (req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Cache-Control", "no-store");
+  res.status(200).send("pong");
+});
+
+// === PING PROXY POUR CONTOURNER LE 403 ===
+app.get("/proxy-ping", async (req, res) => {
+  try {
+    const response = await axios.get("https://alyclick.glitch.me/ping", {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        Accept: "text/plain",
+      },
+    });
+    if (response.data.includes("pong")) {
+      res.setHeader("Content-Type", "text/plain");
+      res.status(200).send("pong");
+    } else {
+      res.status(500).send("Invalid response");
+    }
+  } catch (error) {
+    console.error("❌ Erreur proxy:", error.message);
+    res.status(500).send("Erreur proxy");
+  }
+});
+
+// === SOCKET.IO ===
+let playerCount = 0;
+
+io.on("connection", (socket) => {
+  console.log("👤 Nouveau joueur connecté");
+
+  playerCount++;
+  io.emit("playerCount", playerCount);
+  socket.emit("scoreUpdate", score);
+  socket.emit("serverStartTime", serverStartTime); // Toujours envoyé aux clients si besoin
+
+  // Envoi des améliorations au joueur
+  socket.emit("afkLevel", afkLevel);
+  socket.emit("upgradeClickLevel", upgradeClickLevel);
+  socket.emit("autoClickerLevel", autoClickerLevel);
+  
+  // Heartbeat initial
+  socket.emit("heartbeat", "ok g");
+
+  socket.on("click", () => {
+    // Calcul du score avec les améliorations
+    const pointsEarned = 1 + upgradeClickLevel; // Points par clic + amélioration Upgrade Click
+    score += pointsEarned;
+    io.emit("scoreUpdate", score);
+    saveScore(); // Sauvegarde du score
+  });
+
+  // Augmenter les points avec AFK Boost
+  setInterval(() => {
+    if (afkLevel === 1) {
+      score += 1; // AFK Level 1 : 1 point toutes les 5 secondes
+    } else if (afkLevel === 2) {
+      score += 1; // AFK Level 2 : 1 point toutes les 1 seconde
+    } else if (afkLevel === 3) {
+      score += 2; // AFK Level 3 : 2 points toutes les 1 seconde
+    }
+    io.emit("scoreUpdate", score);
+    saveScore(); // Sauvegarde après chaque point gagné
+  }, afkLevel === 1 ? 5000 : afkLevel === 2 ? 1000 : 500); // Temps entre les points (5s, 1s, 0.5s)
+
+  // Gérer le boost temporaire
+  if (tempBoostActive) {
+    setTimeout(() => {
+      tempBoostActive = false;
+      console.log("🚫 Boost temporaire terminé");
+    }, 30000); // Le boost dure 30s
+  }
+
+  socket.on("buyAfkBoost", () => {
+    if (score >= 10) { // Exemple de coût
+      score -= 10;
+      afkLevel = 1;
+      io.emit("scoreUpdate", score);
+      io.emit("afkLevel", afkLevel);
+      saveScore();
+    }
+  });
+
+  socket.on("buyUpgradeClick", () => {
+    if (score >= 15) { // Exemple de coût
+      score -= 15;
+      upgradeClickLevel = Math.min(upgradeClickLevel + 1, 3); // Limiter au level 3
+      io.emit("scoreUpdate", score);
+      io.emit("upgradeClickLevel", upgradeClickLevel);
+      saveScore();
+    }
+  });
+
+  socket.on("buyAutoClicker", () => {
+    if (score >= 20) { // Exemple de coût
+      score -= 20;
+      autoClickerLevel = Math.min(autoClickerLevel + 1, 3); // Limiter au level 3
+      io.emit("scoreUpdate", score);
+      io.emit("autoClickerLevel", autoClickerLevel);
+      saveScore();
+    }
+  });
+
+  socket.on("buyTempBoost", () => {
+    if (score >= 30 && !tempBoostActive) { // Exemple de coût
+      score -= 30;
+      tempBoostActive = true;
+      io.emit("scoreUpdate", score);
+      console.log("🚀 Boost temporaire activé");
+    }
+  });
+
+  socket.on("disconnect", () => {
+    playerCount--;
+    io.emit("playerCount", playerCount);
+    console.log("❌ Joueur déconnecté");
+  });
+});
+
+// === BONUS DE SCORE ===
+setInterval(() => {
+  io.emit("heartbeat", "ok g");
+  score++; // Bonus passif
+  io.emit("scoreUpdate", score);
+  saveScore();
+  console.log("📡 Bonus de +1");
+}, 10000); // 1 point toutes les 10 secondes
+
+// === LANCEMENT DU SERVEUR ===
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
 });
