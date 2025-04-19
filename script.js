@@ -21,6 +21,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const autoClickerLevelDisplay = document.getElementById("autoClickerLevel"); // Pour afficher le niveau AutoClicker
     const tempBoostStatus = document.getElementById("tempBoostStatus"); // Pour afficher l'état du Boost Temporaire
 
+    // Boutons d'achat des améliorations
+    const afkBoostBtn = document.getElementById("afkBoost");
+    const upgradeClickBoostBtn = document.getElementById("upgradeClickBoost");
+    const autoClickerBoostBtn = document.getElementById("autoClickerBoost");
+
     let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
     let serverStartTime = null; // Temps de démarrage du serveur récupéré depuis le backend
 
@@ -37,6 +42,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // Quand un joueur clique sur "Investir"
     investBtn.addEventListener("click", () => {
       socket.emit("click");
+    });
+
+    // Quand un joueur clique pour acheter un boost
+    afkBoostBtn.addEventListener("click", () => {
+      socket.emit("buyAFKBoost");
+    });
+
+    upgradeClickBoostBtn.addEventListener("click", () => {
+      socket.emit("buyUpgradeClickBoost");
+    });
+
+    autoClickerBoostBtn.addEventListener("click", () => {
+      socket.emit("buyAutoClickerBoost");
     });
 
     // Mise à jour du score
