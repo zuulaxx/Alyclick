@@ -23,6 +23,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const tempBoostButton = document.getElementById("tempBoostButton"); // Bouton du Boost Temporaire
     const tempBoostTimer = document.getElementById("tempBoostTimer"); // Affichage du timer
 
+    // Assurez-vous que les éléments nécessaires existent avant de poursuivre
+    if (!tempBoostButton || !scoreDisplay || !investBtn || !playerCountDisplay) {
+      console.error("Certains éléments DOM sont manquants !");
+      return;
+    }
+
     let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
     let serverStartTime = null; // Temps de démarrage du serveur récupéré depuis le backend
 
