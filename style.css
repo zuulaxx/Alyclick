@@ -19,6 +19,7 @@ h1 {
   font-size: 3rem;
   color: #4CAF50;
 }
+
 .logo {
   width: 1em;
   height: 1em;
@@ -39,6 +40,7 @@ h2 {
 
 #status-text {
   font-weight: bold;
+  color: lime;
 }
 
 /* Affichage du score */
@@ -68,4 +70,37 @@ button:hover {
 /* Conteneur général */
 .container {
   text-align: center;
+}
+
+/* Affichage des améliorations */
+h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-top: 20px;
+}
+
+p {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* État du serveur */
+#server-status {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Statut Boost Temporaire */
+#tempBoostStatus {
+  font-size: 1.2rem;
+  color: #FF9800;
+  font-weight: bold;
+}
+
+/* Améliorations (Boosts) */
+#afkLevel, #upgradeClickLevel, #autoClickerLevel {
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
