@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const playerCountDisplay = document.getElementById("playerCount");
     const statusText = document.getElementById("status-text"); // Pour l'état du serveur
     const serverTimeDisplay = document.getElementById("server-time"); // Pour l'affichage du temps du serveur
+    const afkLevelDisplay = document.getElementById("afkLevel"); // Pour afficher le niveau AFK
+    const upgradeClickLevelDisplay = document.getElementById("upgradeClickLevel"); // Pour afficher le niveau Upgrade Click
+    const autoClickerLevelDisplay = document.getElementById("autoClickerLevel"); // Pour afficher le niveau AutoClicker
+    const tempBoostStatus = document.getElementById("tempBoostStatus"); // Pour afficher l'état du Boost Temporaire
 
     let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
     let serverStartTime = null; // Temps de démarrage du serveur récupéré depuis le backend
@@ -52,6 +56,29 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 300);
       } else {
         console.error("L'élément #players est introuvable !");
+      }
+    });
+
+    // Mise à jour des niveaux d'amélioration
+    socket.on("afkLevel", (level) => {
+      afkLevelDisplay.textContent = `Niveau AFK: ${level}`;
+    });
+
+    socket.on("upgradeClickLevel", (level) => {
+      upgradeClickLevelDisplay.textContent = `Niveau Upgrade Click: ${level}`;
+    });
+
+    socket.on("autoClickerLevel", (level) => {
+      autoClickerLevelDisplay.textContent = `Niveau AutoClicker: ${level}`;
+    });
+
+    socket.on("tempBoostStatus", (status) => {
+      if (status) {
+        tempBoostStatus.textContent = "Boost Temporaire Activé !";
+        tempBoostStatus.style.color = "lime";
+      } else {
+        tempBoostStatus.textContent = "Boost Temporaire Inactif";
+        tempBoostStatus.style.color = "red";
       }
     });
 
