@@ -106,9 +106,13 @@ document.addEventListener('DOMContentLoaded', function () {
       tempBoostCooldown = isCooldown;
       if (tempBoostCooldown) {
         tempBoostButton.disabled = true; // Grise le bouton pendant le cooldown
+        tempBoostStatus.textContent = "Boost Temporaire en cooldown...";
+        tempBoostStatus.style.color = "orange"; // Changer la couleur pour signaler le cooldown
         startCountdown(60); // Compte à rebours de 1 minute
       } else {
         tempBoostButton.disabled = false; // Réactive le bouton après le cooldown
+        tempBoostStatus.textContent = "Boost Temporaire Inactif";
+        tempBoostStatus.style.color = "red";
       }
     });
 
