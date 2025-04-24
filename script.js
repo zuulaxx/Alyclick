@@ -14,14 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const scoreDisplay = document.getElementById("score");
     const investBtn = document.getElementById("invest");
     const playerCountDisplay = document.getElementById("playerCount");
-    const statusText = document.getElementById("status-text"); // Pour l'état du serveur
-    const serverTimeDisplay = document.getElementById("server-time"); // Pour l'affichage du temps du serveur
-    const afkLevelDisplay = document.getElementById("afkLevel"); // Pour afficher le niveau AFK
-    const upgradeClickLevelDisplay = document.getElementById("upgradeClickLevel"); // Pour afficher le niveau Upgrade Click
-    const autoClickerLevelDisplay = document.getElementById("autoClickerLevel"); // Pour afficher le niveau AutoClicker
-    const tempBoostStatus = document.getElementById("tempBoostStatus"); // Pour afficher l'état du Boost Temporaire
-    const tempBoostButton = document.getElementById("tempBoostButton"); // Bouton du Boost Temporaire
-    const tempBoostTimer = document.getElementById("tempBoostTimer"); // Affichage du timer
+    const statusText = document.getElementById("status-text");
+    const serverTimeDisplay = document.getElementById("server-time");
+    const afkLevelDisplay = document.getElementById("afkLevel");
+    const upgradeClickLevelDisplay = document.getElementById("upgradeClickLevel");
+    const autoClickerLevelDisplay = document.getElementById("autoClickerLevel");
+    const tempBoostStatus = document.getElementById("tempBoostStatus");
+    const tempBoostButton = document.getElementById("tempBoostButton");
+    const tempBoostTimer = document.getElementById("tempBoostTimer");
 
     // Assurez-vous que les éléments nécessaires existent avant de poursuivre
     if (!tempBoostButton || !scoreDisplay || !investBtn || !playerCountDisplay) {
@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    let lastPing = Date.now(); // Pour détecter l’inactivité du serveur
-    let serverStartTime = null; // Temps de démarrage du serveur récupéré depuis le backend
+    let lastPing = Date.now();
+    let serverStartTime = null;
 
     let tempBoostCooldown = false;
     let tempBoostActive = false;
@@ -45,22 +45,18 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error("❌ Erreur de connexion socket :", err);
     });
 
-    // Quand un joueur clique sur "Investir"
     investBtn.addEventListener("click", () => {
       socket.emit("click");
     });
 
-    // Quand un joueur clique pour acheter un boost
     tempBoostButton.addEventListener("click", () => {
       socket.emit("buyTempBoost");
     });
 
-    // Mise à jour du score
     socket.on("scoreUpdate", (score) => {
       scoreDisplay.textContent = score;
     });
 
-    // Mise à jour du nombre de joueurs connectés
     socket.on("playerCount", (count) => {
       playerCountDisplay.textContent = count;
 
@@ -75,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // Mise à jour des niveaux d'amélioration
     socket.on("afkLevel", (level) => {
       afkLevelDisplay.textContent = `Niveau AFK: ${level}`;
     });
@@ -91,12 +86,12 @@ document.addEventListener('DOMContentLoaded', function () {
     socket.on("tempBoostActive", (isActive) => {
       tempBoostActive = isActive;
       if (tempBoostActive) {
-        tempBoostButton.disabled = true; // Désactive le bouton pendant le boost
-        startCountdown(30); // Lancer le compte à rebours de 30s
+        tempBoostButton.disabled = true;
+        startCountdown(30);
         tempBoostStatus.textContent = "Boost Temporaire Activé !";
         tempBoostStatus.style.color = "lime";
       } else {
-        tempBoostButton.disabled = false; // Réactive le bouton après le boost
+        tempBoostButton.disabled = false;
         tempBoostStatus.textContent = "Boost Temporaire Inactif";
         tempBoostStatus.style.color = "red";
       }
@@ -105,18 +100,17 @@ document.addEventListener('DOMContentLoaded', function () {
     socket.on("tempBoostCooldown", (isCooldown) => {
       tempBoostCooldown = isCooldown;
       if (tempBoostCooldown) {
-        tempBoostButton.disabled = true; // Grise le bouton pendant le cooldown
+        tempBoostButton.disabled = true;
         tempBoostStatus.textContent = "Boost Temporaire en cooldown...";
-        tempBoostStatus.style.color = "orange"; // Changer la couleur pour signaler le cooldown
-        startCountdown(60); // Compte à rebours de 1 minute
+        tempBoostStatus.style.color = "orange";
+        startCountdown(60);
       } else {
-        tempBoostButton.disabled = false; // Réactive le bouton après le cooldown
+        tempBoostButton.disabled = false;
         tempBoostStatus.textContent = "Boost Temporaire Inactif";
         tempBoostStatus.style.color = "red";
       }
     });
 
-    // Heartbeat toutes les minutes = serveur actif
     socket.on("heartbeat", (msg) => {
       console.log("📡 Heartbeat reçu :", msg);
       lastPing = Date.now();
@@ -126,12 +120,10 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // Récupère le temps de démarrage du serveur
     socket.on("serverStartTime", (startTime) => {
-      serverStartTime = startTime; // Enregistre le temps de démarrage du serveur
+      serverStartTime = startTime;
     });
 
-    // Vérifie toutes les 5s si le serveur est toujours là
     setInterval(() => {
       const now = Date.now();
       if (now - lastPing > 10000) {
@@ -142,14 +134,13 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }, 5000);
 
-    // Fonction pour formater le temps écoulé
     function formatTime(ms) {
       const seconds = Math.floor(ms / 1000);
       const minutes = Math.floor(seconds / 60);
       const hours = Math.floor(minutes / 60);
       const days = Math.floor(hours / 24);
-      const months = Math.floor(days / 30); // approximation
-      const years = Math.floor(months / 12); // approximation
+      const months = Math.floor(days / 30);
+      const years = Math.floor(months / 12);
 
       let timeString = `En ligne depuis `;
 
@@ -163,7 +154,6 @@ document.addEventListener('DOMContentLoaded', function () {
       return timeString;
     }
 
-    // Mise à jour du temps passé en ligne
     setInterval(() => {
       if (serverStartTime) {
         const timeElapsed = Date.now() - serverStartTime;
@@ -171,9 +161,8 @@ document.addEventListener('DOMContentLoaded', function () {
           serverTimeDisplay.textContent = formatTime(timeElapsed);
         }
       }
-    }, 1000); // Actualisation toutes les secondes
+    }, 1000);
 
-    // Fonction pour démarrer le compte à rebours
     function startCountdown(seconds) {
       let remainingTime = seconds;
       tempBoostTimer.textContent = `Temps restant: ${remainingTime}s`;
